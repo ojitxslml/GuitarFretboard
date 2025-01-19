@@ -7,6 +7,7 @@ import { Fretboard } from "./Fretboard";
 
 type GameModeProps = {
   tuning: {
+    name: string;
     strings: Note[];
   };
   onNoteGuess: (correct: boolean) => void;
@@ -36,8 +37,8 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
   const lastDetectionTimeRef = useRef<number>(0);
   const detectionCooldownRef = useRef<number>(1000); // 1 second cooldown
 
-  const extractNoteName = (note: string): string => note.replace(/[0-9]/g, "");
-
+  /* const extractNoteName = (note: string): string => note.replace(/[0-9]/g, ""); */
+  const extractNoteName = (note: string): string => note;
   const updatePitch = useCallback(() => {
     if (!pitchDetectorRef.current || isWaiting) return;
 
@@ -238,7 +239,7 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
         </div>
       )}
 
-      {!isListening && (
+{/*       {!isListening && (
         <div className="grid grid-cols-4 gap-2">
           {[
             "A",
@@ -265,7 +266,7 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
             </button>
           ))}
         </div>
-      )}
+      )} */}
 
       <div className="text-center">
         <p className="text-lg">

@@ -1,15 +1,20 @@
-import React from 'react';
-import { Note, Tuning } from '../types';
-import { ALL_NOTES, STANDARD_TUNINGS } from '../utils/notes';
+import React from "react";
+import { Note, Tuning } from "../types";
+import { ALL_NOTES, STANDARD_TUNINGS } from "../utils/notes";
 
 type TuningSelectorProps = {
   currentTuning: Tuning;
   onTuningChange: (tuning: Tuning) => void;
 };
 
-export const TuningSelector: React.FC<TuningSelectorProps> = ({ currentTuning, onTuningChange }) => {
+export const TuningSelector: React.FC<TuningSelectorProps> = ({
+  currentTuning,
+  onTuningChange,
+}) => {
   const [isCustom, setIsCustom] = React.useState(false);
-  const [customStrings, setCustomStrings] = React.useState<Note[]>(currentTuning.strings);
+  const [customStrings, setCustomStrings] = React.useState<Note[]>(
+    currentTuning.strings
+  );
 
   const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selected = STANDARD_TUNINGS.find((t) => t.name === e.target.value);
@@ -23,13 +28,13 @@ export const TuningSelector: React.FC<TuningSelectorProps> = ({ currentTuning, o
     const newStrings = [...customStrings];
     newStrings[index] = note;
     setCustomStrings(newStrings);
-    onTuningChange({ name: 'Custom', strings: newStrings });
+    onTuningChange({ name: "Custom", strings: newStrings });
   };
 
   const handleStringCountChange = (count: number) => {
-    const newStrings = Array(count).fill('E') as Note[];
+    const newStrings = Array(count).fill("E") as Note[];
     setCustomStrings(newStrings);
-    onTuningChange({ name: 'Custom', strings: newStrings });
+    onTuningChange({ name: "Custom", strings: newStrings });
   };
 
   return (
@@ -37,9 +42,9 @@ export const TuningSelector: React.FC<TuningSelectorProps> = ({ currentTuning, o
       <div className="flex gap-4">
         <select
           className="px-3 py-2 border rounded-md"
-          value={isCustom ? 'custom' : currentTuning.name}
+          value={isCustom ? "custom" : currentTuning.name}
           onChange={(e) => {
-            if (e.target.value === 'custom') {
+            if (e.target.value === "custom") {
               setIsCustom(true);
             } else {
               handlePresetChange(e);
@@ -79,7 +84,9 @@ export const TuningSelector: React.FC<TuningSelectorProps> = ({ currentTuning, o
                 <select
                   className="px-3 py-2 border rounded-md"
                   value={note}
-                  onChange={(e) => handleCustomStringChange(index, e.target.value as Note)}
+                  onChange={(e) =>
+                    handleCustomStringChange(index, e.target.value as Note)
+                  }
                 >
                   {ALL_NOTES.map((n) => (
                     <option key={n} value={n}>
