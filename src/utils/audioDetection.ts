@@ -3,9 +3,9 @@ export class PitchDetector {
   private analyser: AnalyserNode;
   private mediaStream: MediaStream | null = null;
   private isListening = false;
-  private readonly AMPLITUDE_THRESHOLD = 0.01;
+  private readonly AMPLITUDE_THRESHOLD = 0.05;
   private noteHistory: { note: string; timestamp: number }[] = [];
-  private readonly HISTORY_TIME_FRAME = 500; // 1 segundo
+  private readonly HISTORY_TIME_FRAME = 500; // 500 ms
   private lastNoteEmitTime: number = 0;
   private noteEmitInterval: number | null = null;
 
@@ -17,12 +17,16 @@ export class PitchDetector {
 
   async start() {
     try {
-      this.mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const source = this.audioContext.createMediaStreamSource(this.mediaStream);
+      this.mediaStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      const source = this.audioContext.createMediaStreamSource(
+        this.mediaStream
+      );
       source.connect(this.analyser);
       this.isListening = true;
 
-      // Emisión periódica de notas cada 500 ms
+      // Emitting note in a interval of 500ms
       this.noteEmitInterval = setInterval(() => this.emitNote(), 500);
     } catch (error) {
       console.error("Error al acceder al micrófono:", error);
@@ -68,13 +72,14 @@ export class PitchDetector {
   getPrevalentNote(): string | null {
     const currentTime = Date.now();
 
-    // Si no ha pasado suficiente tiempo, no emitimos la nota
-    if (currentTime - this.lastNoteEmitTime < this.HISTORY_TIME_FRAME) return null;
+    // Wait the sufficient time before emitting the note
+    if (currentTime - this.lastNoteEmitTime < this.HISTORY_TIME_FRAME)
+      return null;
 
     const prevalentNote = this.calculatePrevalentNote();
     this.lastNoteEmitTime = currentTime;
 
-    this.noteHistory = []; // Reiniciar el historial después de emitir
+    this.noteHistory = []; // Restart history after emitting
     return prevalentNote;
   }
 
@@ -114,7 +119,10 @@ export class PitchDetector {
 
     if (rms < this.AMPLITUDE_THRESHOLD) return null;
 
-    const frequency = this.autoCorrelate(dataArray, this.audioContext.sampleRate);
+    const frequency = this.autoCorrelate(
+      dataArray,
+      this.audioContext.sampleRate
+    );
     if (frequency && frequency !== -1) {
       return frequency;
     }
@@ -130,7 +138,20 @@ export class PitchDetector {
   }
 
   private frequencyToNote(frequency: number): string {
-    const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const notes = [
+      "C",
+      "C#",
+      "D",
+      "D#",
+      "E",
+      "F",
+      "F#",
+      "G",
+      "G#",
+      "A",
+      "A#",
+      "B",
+    ];
     const a4 = 440;
     const c0 = a4 * Math.pow(2, -4.75);
 

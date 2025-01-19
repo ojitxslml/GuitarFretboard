@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Note, GameState } from "../types";
-import { getNoteAtFret } from "../utils/notes";
-import { PitchDetector } from "../utils/audioDetection";
+import { Note, GameState } from "../../types";
+import { getNoteAtFret } from "../../utils/notes";
+import { PitchDetector } from "../../utils/audioDetection";
 import { Mic, MicOff } from "lucide-react";
-import { Fretboard } from "./Fretboard";
+import { Fretboard } from "../Fretboard";
 
 type GameModeProps = {
   tuning: {
@@ -11,9 +11,14 @@ type GameModeProps = {
     strings: Note[];
   };
   onNoteGuess: (correct: boolean) => void;
+  showScore: boolean;
 };
 
-export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
+export const GameMode: React.FC<GameModeProps> = ({
+  tuning,
+  onNoteGuess,
+  showScore,
+}) => {
   const [gameState, setGameState] = useState<GameState>({
     currentNote: {
       string: 0,
@@ -59,7 +64,8 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
         }
 
         noteHistoryRef.current = noteHistoryRef.current.filter(
-          (n, index) =>
+          (_, index) =>
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             now - (noteHistoryRef.current[index] as any).timestamp < 1000
         );
 
@@ -68,6 +74,7 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
     }
 
     requestAnimationFrame(updatePitch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameState, isWaiting]);
 
   const getMostFrequentNote = (notes: string[]): string | null => {
@@ -88,18 +95,19 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
   useEffect(() => {
     lastNoteRef.current = gameState.currentNote.note;
   }, [gameState.currentNote.note]);
+
   const handleGuess = useCallback(
     (guessedNote: string) => {
       if (isWaiting) return;
 
       const guessedNoteName = extractNoteName(guessedNote);
       const targetNoteName = extractNoteName(lastNoteRef.current);
-      
-      // Actualizar el estado del juego
+
+      // Update GameState
       setGameState((prev) => ({
         ...prev,
         score: prev.score + (guessedNoteName === targetNoteName ? 1 : 0),
-        attempts: prev.attempts + 1, // Siempre aumentar los intentos
+        attempts: prev.attempts + 1, // Increment attempts
       }));
 
       if (guessedNoteName !== targetNoteName) {
@@ -107,13 +115,14 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
         setHighlightedFret(position);
       }
 
-      onNoteGuess(guessedNoteName === targetNoteName); // Notificar al componente padre si la adivinanza fue correcta o incorrecta
+      onNoteGuess(guessedNoteName === targetNoteName); // Notify component if guess is correct
 
       if (guessedNoteName === targetNoteName) {
         setIsWaiting(true);
-        setTimeout(generateNewNote, 500); // Generar una nueva nota después de un tiempo
+        setTimeout(generateNewNote, 500); // Wait before generate a new note
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [isWaiting, onNoteGuess]
   );
 
@@ -162,7 +171,7 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
         }
       }
     }
-    return { string: 0, fret: 0 }; // Si no se encuentra la nota, retornar una posición por defecto
+    return { string: 0, fret: 0 }; // If no note return to a default position
   };
 
   useEffect(() => {
@@ -189,7 +198,7 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <Fretboard
           tuning={tuning}
-           highlightedNote={
+          highlightedNote={
             highlightedFret || {
               string: gameState.currentNote.string,
               fret: gameState.currentNote.fret,
@@ -201,10 +210,6 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
           }}
         />
       </div>
-
-      {isWaiting && (
-        <div className="text-center text-blue-600">Get ready...</div>
-      )}
 
       <div className="flex justify-center space-x-4">
         <button
@@ -239,7 +244,7 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
         </div>
       )}
 
-{/*       {!isListening && (
+      {/*       {!isListening && (
         <div className="grid grid-cols-4 gap-2">
           {[
             "A",
@@ -268,11 +273,13 @@ export const GameMode: React.FC<GameModeProps> = ({ tuning, onNoteGuess }) => {
         </div>
       )} */}
 
-      <div className="text-center">
-        <p className="text-lg">
-          Score: {gameState.score} / {gameState.attempts}
-        </p>
-      </div>
+      {showScore && (
+        <div className="text-center">
+          <p className="text-lg">
+            Score: {gameState.score} / {gameState.attempts}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
