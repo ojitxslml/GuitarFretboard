@@ -58,7 +58,7 @@ export const Fretboard: React.FC<FretboardProps> = ({ tuning, highlightedNote, h
                     flex-1 h-16 border-r border-gray-300 flex items-center justify-center cursor-pointer
                     ${fret === 0 ? 'border-l-2 border-l-gray-800' : ''}
                     ${isMatchingNote ? 
-                      (isSearchString ? 'bg-cyan-500 text-white' : 'bg-blue-100  text-white') : 
+                      (isSearchString ? 'bg-blue-500 text-white' : 'bg-sky-300  text-white') : 
                       'hover:bg-gray-100'
                     }
                     ${isSearchHighlighted ? 'bg-green-500 text-white' : ''}
