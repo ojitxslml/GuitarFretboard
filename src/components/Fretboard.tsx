@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Note, Tuning } from "../types";
 import { getNoteAtFret } from "../utils/notes";
+import { noteToValue } from "../utils/noteToValue";
+import { AudioPlayer } from "../utils/audio";
 
 type FretboardProps = {
   tuning: Tuning;
@@ -62,6 +64,16 @@ export const Fretboard: React.FC<FretboardProps> = ({
     "border-b-[8px]", // Para guitarra de 8 cuerdas
   ];
 
+  const [audioPlayer] = useState(() => new AudioPlayer());
+
+  const handlePlayNote = (note: Note) => {
+    const [noteValue, octave] = noteToValue(note);
+
+    if (audioPlayer.samples && audioPlayer.audioContext) {
+      audioPlayer.playNote(noteValue, octave);
+    }
+  };
+
   return (
     <div className="w-full overflow-x-auto">
       <div className="min-w-[800px]">
@@ -86,7 +98,10 @@ export const Fretboard: React.FC<FretboardProps> = ({
               return (
                 <div
                   key={fret}
-                  onClick={() => onFretClick?.(stringIndex, fret, note)}
+                  onClick={() => {
+                    handlePlayNote(note);
+                    onFretClick?.(stringIndex, fret, note);
+                  }}
                   className={`
                     flex-1 h-14 border-r border-gray-300 flex items-center justify-center cursor-pointer
                     ${fret === 0 ? "border-r-4 border-r-gray-800" : ""}
