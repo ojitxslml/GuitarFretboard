@@ -84,7 +84,6 @@ export class AudioPlayer {
     return (
       fetch(url)
         .then((response) => response.arrayBuffer())
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         .then((buffer) => this.audioContext!.decodeAudioData(buffer))
     );
   }
@@ -129,7 +128,6 @@ export class AudioPlayer {
 
     return [
       adjustedNoteValue,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       this.samples![`C${adjustedOctave}` as SampleName],
     ];
   }
