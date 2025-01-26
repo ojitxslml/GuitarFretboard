@@ -24,6 +24,7 @@ export const Fretboard: React.FC<FretboardProps> = ({
   onFretClick,
 }) => {
   const frets = Array.from({ length: 12 }, (_, i) => i);
+  const fretMarkers = [3, 5, 7, 9, 12]; // Traditional guitar fret markers
 
   const getAllMatchingNotes = (highlightedNote?: {
     string: number;
@@ -32,7 +33,7 @@ export const Fretboard: React.FC<FretboardProps> = ({
     if (!highlightedNote) return [];
     const matchingNotes: { string: number; fret: number }[] = [];
 
-    // Recorrer todas las cuerdas y trastes para encontrar notas coincidentes
+    // Mark same notes in all strings
     tuning.strings.forEach((openNote, stringIndex) => {
       frets.forEach((fret) => {
         const note = getNoteAtFret(openNote, fret);
@@ -54,14 +55,14 @@ export const Fretboard: React.FC<FretboardProps> = ({
   const matchingNotes = getAllMatchingNotes(highlightedNote);
 
   const stringClasses = [
-    "border-b ", // Cuerda más grave para guitarra de 6 cuerdas
-    "border-b-[2px]", // Cuerda más aguda
+    "border-b",
+    "border-b-[2px]",
     "border-b-[3px]",
     "border-b-[4px]",
     "border-b-[5px]",
     "border-b-[6px]",
-    "border-b-[7px]", // Para guitarra de 7 cuerdas
-    "border-b-[8px]", // Para guitarra de 8 cuerdas
+    "border-b-[7px]",
+    "border-b-[8px]",
   ];
 
   const [audioPlayer] = useState(() => new AudioPlayer());
@@ -76,6 +77,20 @@ export const Fretboard: React.FC<FretboardProps> = ({
 
   return (
     <div className="w-full overflow-x-auto">
+      {/* Fret markers */}
+      <div className="min-w-[800px] flex mb-2">
+        {frets.map((fret) => (
+          <div key={fret} className="flex-1 flex justify-center">
+            {fretMarkers.includes(fret) && (
+              <div className={`
+                w-4 h-4 rounded-full bg-gray-300
+                ${fret === 12 ? 'relative after:content-[""] after:absolute after:left-6 after:w-4 after:h-4 after:rounded-full after:bg-gray-300' : ''}
+              `} />
+            )}
+          </div>
+        ))}
+      </div>
+      {/* Fretboard */}
       <div className="min-w-[800px]">
         {tuning.strings.map((openNote, stringIndex) => (
           <div
@@ -91,7 +106,7 @@ export const Fretboard: React.FC<FretboardProps> = ({
                 highlightedSearchNote?.string === stringIndex &&
                 highlightedSearchNote?.fret === fret;
 
-              // Verificar si la nota está en la cuerda buscada
+              // Verify if is the string searched
               const isSearchString =
                 highlightedSearchNote?.string === stringIndex;
 
@@ -109,7 +124,7 @@ export const Fretboard: React.FC<FretboardProps> = ({
                       isMatchingNote
                         ? isSearchString
                           ? "bg-blue-500 text-white"
-                          : "bg-sky-300  text-white"
+                          : "bg-sky-300 text-white"
                         : "hover:bg-gray-100"
                     }
                     ${isSearchHighlighted ? "bg-green-500 text-white" : ""}
