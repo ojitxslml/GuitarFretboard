@@ -19,8 +19,6 @@ import {
   MusicNote as MusicNoteIcon,
   Home as HomeIcon,
   SportsEsports as GameIcon,
-  /* School as LearnIcon,
-  Settings as SettingsIcon, */
 } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
